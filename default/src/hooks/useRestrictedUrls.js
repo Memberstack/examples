@@ -1,48 +1,27 @@
-import { useEffect, useState } from "react";
-import { useMemberstack } from "@memberstack/react";
+import { useState, useEffect } from "react";
+import useApp from "@/app/hooks/useApp";
+import { RestrictedURLGroup } from "@/app/helpers/restrictedUrlGroup";
 
-export default function useRestrictedUrls(currentPath) {
-  const memberstack = useMemberstack();
-  const [isRestricted, setIsRestricted] = useState(true);
-  const [urlInfo, setUrlInfo] = useState({});
-
-  const getStatusByFilter = (filter, url, currentPath) => {
-    let formattedUrl = `/${url}`;
-    return filter === "EQUALS"
-      ? formattedUrl === currentPath
-      : currentPath.startsWith(formattedUrl);
-  };
-
-  const getRestrictedUrlInfo = (restrictedUrls, currentPath) => {
-    const restrictedUrlInfo = restrictedUrls.find((urlGroup) => {
-      const urlMatch = urlGroup.urls.find((url) => {
-        return getStatusByFilter(url.filter, url.url, currentPath);
-      });
-      return urlMatch;
-    });
-    return restrictedUrlInfo;
-    // let plans = restrictedUrlInfo?.plans.map((plan) => plan.id);
-    // setPlansRequired(plans);
-  };
-
-  const checkIsRestricted = (restrictedUrls, currentPath) => {
-    return restrictedUrls.some((restrictedUrl) => {
-      return restrictedUrl.urls.some((url) => {
-        return getStatusByFilter(url.filter, url.url, currentPath);
-      });
-    });
-  };
+export default function useRestrictedURLs(currentPath) {
+  const app = useApp();
+  const [isRestricted, setIsRestricted] = useState(false);
+  const [plans, setPlans] = useState([]);
+  const [info, setInfo] = useState(null);
 
   useEffect(() => {
-    memberstack.getRestrictedUrlGroups().then(({ data: restrictedUrls }) => {
-      console.log(restrictedUrls);
-      let pageRestricted = checkIsRestricted(restrictedUrls, currentPath);
-      let info = getRestrictedUrlInfo(restrictedUrls, currentPath);
-      console.log(info, pageRestricted);
-      setIsRestricted(pageRestricted);
-      setUrlInfo(info);
-    });
-  }, [currentPath]);
+    if (!app) return;
+    let restrictedUrls = app?.contentGroups;
+    let urlGroup = new RestrictedURLGroup(restrictedUrls, currentPath);
+    setIsRestricted(urlGroup?.isRestricted() ? true : false);
+    setPlans(urlGroup?.plans || []);
+    setInfo(urlGroup?.info || null);
+  }, [app]);
 
-  return { isRestricted, urlInfo };
+  return [
+    isRestricted,
+    {
+      plans,
+      ...info,
+    },
+  ];
 }
