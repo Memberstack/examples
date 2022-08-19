@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyAuth, getMember, getApp } from "@/app/lib/memberstack";
+import { verifyAuth, getCurrentMember, getApp } from "@/app/lib/memberstack";
 import {
   memberHasPlans,
   RestrictedURLGroup,
@@ -25,7 +25,7 @@ export default function withMemberstack(
 
       let auth = await verifyAuth(req.cookies.get(MS_TOKEN));
       if (auth && auth?.id) {
-        member = await getMember(auth.id);
+        member = await getCurrentMember(req.cookies.get(MS_TOKEN));
         token_verified = true;
       }
 

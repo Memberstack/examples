@@ -11,11 +11,17 @@ const modalFactory = ({ type }) => {
         type,
         planId: props.planId,
         priceId: props.priceId,
-      }).then(({ data, type }) => hideModal());
+      }).then(({ data, type }) => {
+        console.log(data);
+        // analytics.identify("12091906-01011992", {
+        //   name: "Grace Hopper",
+        //   email: "grace@usnavy.gov",
+        // });
+        hideModal();
+      });
     }, []);
 
     React.useEffect(() => {
-      console.log("hello", isLoggedIn);
       isLoggedIn && hideModal();
     }, [isLoggedIn]);
 

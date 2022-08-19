@@ -20,8 +20,8 @@ export default function useRestrictedURLs(currentPath) {
   return [
     isRestricted,
     {
-      plans,
       ...info,
+      plans,
     },
   ];
 }

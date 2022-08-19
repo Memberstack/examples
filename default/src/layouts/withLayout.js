@@ -25,6 +25,41 @@ const ContentLayout = ({ children }) => {
   );
 };
 
+const MainContent = ({ children }) => (
+  <div className="flex-1 flex flex-col h-screen justify-between overflow-hidden">
+    <header className="w-full h-[65px] bg-emerald-600" />
+    {/* <!-- Main content --> */}
+    {/* <div className="flex-1 flex items-stretch overflow-hidden">{children}</div> */}
+    <div className="flex flex-col flex-1 w-full">
+      <main className="flex flex-1">
+        <div className="flex flex-col w-full">{children}</div>
+      </main>
+      {/* <footer /> */}
+    </div>
+    <footer />
+  </div>
+);
+
+const RightBox = ({ color }) => {
+  /* <!-- Secondary column (hidden on smaller screens) --> */
+  return (
+    <aside className="hidden lg:block self-center w-96 mx-3 overflow-hidden shadow-lg">
+      <div className="h-[96vh] bg-red-400 p-8 rounded-lg">
+        {/* <ActivityFeed /> */}hello
+      </div>
+    </aside>
+  );
+};
+
+const DashboardLayout = ({ children }) => {
+  return (
+    <div className="h-screen flex overflow-hidden">
+      {/* <SideBar signOut={signOut} /> */}
+      <MainContent>{children}</MainContent>
+      <RightBox />
+    </div>
+  );
+};
 const withLayout = (Page, variant) => (props) =>
   (
     <Switch expression={variant} fallback={<Page {...props} />}>
@@ -34,7 +69,33 @@ const withLayout = (Page, variant) => (props) =>
       <ContentLayout case="content">
         <Page {...props} />
       </ContentLayout>
+      <DashboardLayout case="dashboard">
+        <Page {...props} />
+      </DashboardLayout>
     </Switch>
   );
 
 export default withLayout;
+
+const LayoutController = ({
+  children,
+  path,
+  allowAllMembers,
+  requiredPlans,
+}) => {
+  return (
+    <>
+      {isRestricted ? (
+        <MemberstackProtected onUnauthorized={<SignInModal />}>
+          {!config?.allowAllMembers && config?.plans.length > 0 ? (
+            <Component {...pageProps} />
+          ) : (
+            <Component {...pageProps} />
+          )}
+        </MemberstackProtected>
+      ) : (
+        <Component {...pageProps} />
+      )}
+    </>
+  );
+};

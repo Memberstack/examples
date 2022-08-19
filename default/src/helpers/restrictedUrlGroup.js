@@ -38,8 +38,6 @@ export class RestrictedURLGroup {
 }
 
 export const memberHasPlans = (member, plans) => {
-  console.log(member);
-  console.log(plans);
   return plans.some((planId) =>
     member?.planConnections?.find((con) => con.planId === planId)
   );
